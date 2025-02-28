@@ -1,4 +1,4 @@
-name: Gradle Build
+name: Build Gradle APP
 
 on:
   push:
@@ -15,10 +15,10 @@ jobs:
     - name: Set up JDK for the APP
       uses: actions/setup-java@v3
       with:
-        java-version: '17'  # Adjust to your Java version
+        java-version: '17'
         distribution: 'temurin'
         
-    - name: Make Gradle wrapper executable
+    - name: Use Gradle wrapper as executable
       run: chmod +x ./gradlew
       
     - name: Build the Program with Gradle
