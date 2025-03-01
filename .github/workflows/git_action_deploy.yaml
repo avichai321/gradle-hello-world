@@ -6,7 +6,7 @@ on:
     - master
 
 jobs:
-  build:
+  Task_1_build_program_as_is:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,73 @@ jobs:
         chmod +x ./gradlew
         ./gradlew build  
     
-    - name: Check jar file version
+    - name: Check jar file version and run java
       run: |
         cd build/libs
         ls -l
+        OUTPUT=$(java -jar gradle-hello-world-all.jar)  
+        echo "Program output:"
+        echo "$OUTPUT"
+  
+  Task_2_change_code_and_change_ver_first:
+    runs-on: ubuntu_latest
+    needs: Task_1_build_program_as_is
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Update Hello World to Hello World Avicii 
+      run: |
+        # The file path for the java file
+        FILE_PATH="src/main/java/com/ido/HelloWorld.java"
+        
+        # The 2 var strings for search and replace
+        SEARCH_STRING="System.out.println(\"Hello World!\");"
+        REPLACE_STRING="System.out.println(\"Hello World Avicii!\");"
+        
+        # Check if file exists
+        if [ ! -f "$FILE_PATH" ]; then
+          echo "Error: File $FILE_PATH does not exist"
+          exit 1
+        fi
+        
+        # Change the line
+        sed -i "s/$SEARCH_STRING/$REPLACE_STRING/g" "$FILE_PATH"
+
+    - name: Update build.gradle.kts version or change
+      run: |
+        # Define the gradle file path
+        GRADLE_FILE="build.gradle.kts"
+        
+        # Check if file exists
+        if [ ! -f "$GRADLE_FILE" ]; then
+          echo "Error: $GRADLE_FILE does not exist"
+          exit 1
+        fi
+        
+        # Check if 'version' property already exists
+        if grep -q "version =" "$GRADLE_FILE"; then
+          # Update existing version property
+          sed -i 's/version = ".*"/version = "1.0.0"/g' "$GRADLE_FILE"
+          echo "Updated existing version property"
+        else
+        # Otherwise, add it near the top of the file
+            sed -i '1s/^/version = "1.0.0"\n\n/' "$GRADLE_FILE"
+  
+  
+    - name: Use Gradle wrapper as executable and Build the Program with Gradle
+      run: |
+        chmod +x ./gradlew
+        ./gradlew build
+
+    - name: Check jar file version and run java
+      run: |
+        cd build/libs
+        ls -l
+        OUTPUT=$(java -jar gradle-hello-world-all.jar)  
+        echo "Program output:"
+        echo "$OUTPUT"
+
+
+
+    
