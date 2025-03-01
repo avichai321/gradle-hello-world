@@ -19,7 +19,14 @@ jobs:
         distribution: 'temurin'
         
     - name: Use Gradle wrapper as executable
-      run: chmod +x ./gradlew
+      run: |
+        chmod +x ./gradlew
       
     - name: Build the Program with Gradle
-      run: ./gradlew build
+      run: | 
+        ./gradlew build
+    
+    - name: Check jar file version
+      run: |
+        cd /build/lib
+        ls 
