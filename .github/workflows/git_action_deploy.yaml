@@ -25,5 +25,4 @@ jobs:
     
     - name: Check jar file version
       run: |
-        cd /build/libs
         ls -l
