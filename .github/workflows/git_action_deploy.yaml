@@ -87,7 +87,7 @@ jobs:
       run: |
         cd build/libs
         ls -l
-        OUTPUT=$(java -jar gradle-hello-world-all-1.0.0.jar)  
+        OUTPUT=$(java -jar gradle-hello-world-1.0.0-all.jar)  
         echo "Program output:"
         echo "$OUTPUT"
 
