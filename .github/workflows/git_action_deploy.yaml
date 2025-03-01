@@ -18,15 +18,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         
-    - name: Use Gradle wrapper as executable
+    - name: Use Gradle wrapper as executable and Build the Program with Gradle
       run: |
         chmod +x ./gradlew
-      
-    - name: Build the Program with Gradle
-      run: | 
-        ./gradlew build
+        ./gradlew build  
     
     - name: Check jar file version
       run: |
-        cd /build/lib
-        ls 
+        cd /build/libs
+        ls -l
