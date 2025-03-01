@@ -74,7 +74,7 @@ jobs:
           echo "Updated existing version property"
         else
         # Otherwise, add it near the top of the file
-            sed -i '1s/^/version = "1.0.0"\n\n/' "$GRADLE_FILE"
+          sed -i '1s/^/version = "1.0.0"\n\n/' "$GRADLE_FILE"
   
   
     - name: Use Gradle wrapper as executable and Build the Program with Gradle
