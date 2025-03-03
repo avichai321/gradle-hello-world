@@ -1,4 +1,4 @@
-//import java.io.File
+import java.io.File
 
 plugins {
     kotlin("jvm") version "1.6.20"
@@ -21,40 +21,40 @@ repositories {
     mavenCentral()
 }
 
-//val projectVersionFile = file("version.txt")
+val projectVersionFile = file("version.txt")
 
-// Function to read and increment version
-//fun getNextVersion(): String {
-//    if (!projectVersionFile.exists()) {
-//        projectVersionFile.writeText("1.0.0")
-//    }
+//Function to read and increment version
+fun getNextVersion(): String {
+if (!projectVersionFile.exists()) {
+    projectVersionFile.writeText("1.0.0")
+}
 
-//    val currentVersion = projectVersionFile.readText().trim()
-//    val versionParts = currentVersion.split(".").map { it.toInt() }.toMutableList()
+val currentVersion = projectVersionFile.readText().trim()
+val versionParts = currentVersion.split(".").map { it.toInt() }.toMutableList()
 
-    // Increment the patch version
-//    versionParts[2] = versionParts[2] + 1
+// Increment the patch version
+versionParts[2] = versionParts[2] + 1
 
-//    val newVersion = versionParts.joinToString(".")
-//    projectVersionFile.writeText(newVersion)
-//    return newVersion
-//}
+val newVersion = versionParts.joinToString(".")
+projectVersionFile.writeText(newVersion)
+return newVersion
+}
 
 // Set the project version dynamically
-//version = getNextVersion()
+version = getNextVersion()
 
-// Ensure JAR file name matches repo/directory name
-//val jarName = rootProject.name
+//Ensure JAR file name matches repo/directory name
+val jarName = rootProject.name
 
-//tasks.withType<Jar> {
-//    archiveBaseName.set(jarName)
-//    archiveVersion.set(version)
-//}
+tasks.withType<Jar> {
+    archiveBaseName.set(jarName)
+    archiveVersion.set(version)
+}
 
-//tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-//    archiveBaseName.set(jarName)
-//    archiveVersion.set(version)
-//}
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+    archiveBaseName.set(jarName)
+    archiveVersion.set(version)
+}
 
 graalvmNative {
     binaries {

@@ -1,4 +1,4 @@
-name: Build Gradle APP
+name: Build gradle-hello-world APP
 
 on:
   push:
