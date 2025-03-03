@@ -1,7 +1,7 @@
 # Stage 1: Build the JAR file using Gradle Wrapper
 FROM gradle:7.3-jdk11 AS builder
 
-ARG REPO_NAME=app
+ARG REPO_NAME=my-app
 ENV REPO_NAME=${REPO_NAME}
 # Set the working directory in the container
 WORKDIR /app
@@ -26,7 +26,7 @@ RUN VERSION=$(cat version.txt) && \
     ./gradlew clean build -x test && \
     cd build/libs && \
     ls && \
-    VERSION=$(cat version.txt) &&\
+    VERSION=$(cat /app/version.txt) &&\
     # Rename the JAR with REPO_NAME
     mv /app/build/libs/app-${VERSION}-all.jar /app/build/libs/${REPO_NAME}-${VERSION}-all.jar
 
@@ -49,7 +49,7 @@ COPY --from=builder /app/build/libs/ ./libs/
 # Create a startup script that finds the correct JAR
 RUN echo '#!/bin/sh' > /app/startup.sh && \
     echo 'VERSION=$(cat /app/version.txt)' >> /app/startup.sh && \
-    echo 'JAR_FILE="/app/build/libs/${REPO_NAME}-${VERSION}-all.jar"' >> /app/startup.sh && \
+    echo 'JAR_FILE="/app/libs/${REPO_NAME}-${VERSION}-all.jar"' >> /app/startup.sh && \
     echo 'echo "Starting application: ${JAR_FILE}"' >> /app/startup.sh && \
     echo 'java -jar ${JAR_FILE}' >> /app/startup.sh && \
     chmod +x /app/startup.sh
