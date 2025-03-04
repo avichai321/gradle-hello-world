@@ -1,15 +1,17 @@
 import java.util.Properties
-import java.io.File
 
 plugins {
     kotlin("jvm") version "1.6.20"
     id("application")
     id("java")
     id("idea")
+
+    // This is used to create a GraalVM native image
     id("org.graalvm.buildtools.native") version "0.9.11"
+
+    // This creates a fat JAR
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
-
 group = "com.ido"
 description = "HelloWorld"
 application.mainClass.set("com.ido.HelloWorld")
@@ -18,31 +20,41 @@ repositories {
     mavenCentral()
 }
 
-// Function to read and increment version in gradle.properties
-fun getNextVersion(): String {
-    val propertiesFile = File("gradle.properties")
-    val properties = Properties()
+// Define the properties file and load properties
+val propertiesFile = file("gradle.properties")
+val properties = Properties()
 
-    if (propertiesFile.exists()) {
-        propertiesFile.inputStream().use { properties.load(it) }
-    }
-
-    var version = properties.getProperty("version", "1.0.0")
-    val versionParts = version.split(".").map { it.toInt() }.toMutableList()
-    
-    // Increment the patch version
-    versionParts[2] += 1
-    
-    val newVersion = versionParts.joinToString(".")
-    properties.setProperty("version", newVersion)
-    
-    propertiesFile.outputStream().use { properties.store(it, "Updated version") }
-    
-    return newVersion
+// Load properties from the file if it exists, else create a default one
+if (propertiesFile.exists()) {
+    propertiesFile.reader().use { properties.load(it) }
+} else {
+    // Create gradle.properties and add the default version if it doesn't exist
+    properties["project.version"] = "1.0.0"
+    propertiesFile.writer().use { properties.store(it, null) }
 }
 
+// Function to increment version automatically
+fun incrementVersion(version: String): String {
+    val versionParts = version.split(".").map { it.toInt() }.toMutableList()
+
+    // Increment the patch version
+    versionParts[2] = versionParts[2] + 1
+
+    return versionParts.joinToString(".")
+}
+
+// Get the current version from gradle.properties
+var currentVersion = properties.getProperty("project.version", "1.0.0")
+
+// Increment version for next build
+currentVersion = incrementVersion(currentVersion)
+
+// Update gradle.properties with the new version
+properties["project.version"] = currentVersion
+propertiesFile.writer().use { properties.store(it, null) }
+
 // Set the project version dynamically
-version = getNextVersion()
+version = currentVersion
 
 // Ensure JAR file name matches repo/directory name
 val jarName = rootProject.name

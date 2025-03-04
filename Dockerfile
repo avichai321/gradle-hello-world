@@ -1,33 +1,33 @@
 # Stage 1: Build the JAR file using Gradle Wrapper
-FROM gradle:7.3-jdk11 AS builder
+FROM gradle:7.4-jdk11 AS builder
 
 ARG REPO_NAME=my-app
 ENV REPO_NAME=${REPO_NAME}
 # Set the working directory in the container
 WORKDIR /app
 
-#Copy the Gradle wrapper files and build configuration
+# Copy the Gradle wrapper files and build configuration
 COPY gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties gradle/ ./gradle/
-COPY build.gradle.kts ./
-COPY gradlew gradlew.bat ./
+# Ensure this is your updated build.gradle.kts
+COPY build.gradle.kts ./  
+# Copy gradle wrapper scripts
+COPY gradlew gradlew.bat ./ 
 
-#Copy the version file and source code
+
+# Copy the source code
 COPY src ./src
 # Fix potential line ending issues
 RUN sed -i 's/\r$//' ./gradlew
+
 # Ensure gradlew has executable permissions and check if it exists
 RUN ls -la && chmod +x ./gradlew
 
+# Ensure repositories are accessible and build the JAR
+RUN ./gradlew clean build -x test
 
-# Get version and build using gradlew
-RUN  ./gradlew clean build -x test && \
-    cd build/libs && \
-    ls && \
-    VERSION=$(grep "version =" build.gradle.kts | sed -E 's/.*version = "([^"]+)".*/\1/') &&\
-    # Rename the JAR with REPO_NAME
-    mv /app/build/libs/app-${VERSION}-all.jar /app/build/libs/${REPO_NAME}-${VERSION}-all.jar
-   
-
+# Extract version from gradle.properties and rename JAR
+RUN VERSION=$(grep -oP '(?<=project.version=)[^\r]+' gradle.properties) && \
+    mv /app/build/libs/${REPO_NAME}-${VERSION}-all.jar /app/build/libs/${REPO_NAME}-${VERSION}-all.jar
 
 # Stage 2: Create the runtime image
 FROM openjdk:11
@@ -42,7 +42,6 @@ WORKDIR /app
 # Copy the built JAR from the build stage
 COPY --from=builder /app/build/libs/ ./libs/
 
-
 # Create a startup script that finds the correct JAR
 RUN echo '#!/bin/sh' > /app/startup.sh && \
     echo 'JAR_FILE="/app/libs/${REPO_NAME}-${VERSION}-all.jar"' >> /app/startup.sh && \
@@ -56,7 +55,7 @@ RUN chown -R ubuser:ubuser /app
 # Expose port 8080
 EXPOSE 8080
 
-#switch to this non-root user
+# Switch to this non-root user
 USER ubuser
 
 # Run the startup script
