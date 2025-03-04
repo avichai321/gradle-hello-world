@@ -1,17 +1,16 @@
-name: Build and Push gradle-hello-world-multistage-docker APP
+name: Build Multistage Docker update repo ver and Push Docker Image to Docker Hub
 
 on:
   push:
     branches:
       - task4
-  workflow_dispatch:
 
 jobs:
-  build:
+  Build_Docker:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.extract_version.outputs.VERSION }}
-
+    
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -24,15 +23,14 @@ jobs:
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "::set-output name=VERSION::$VERSION"
 
-    - name: Build Multistage Docker image
+    - name: Build Docker Image
       run: |
         REPO_NAME=${{ github.event.repository.name }}
         docker build --build-arg REPO_NAME=${REPO_NAME} -t ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${{ env.VERSION }} .
 
-    - name: Save Docker Image for Next Job
+    - name: Save Docker Image
       run: |
-        docker save ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ env.VERSION }} -o image.tar
-      shell: bash
+        docker save -o image.tar ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ env.VERSION }}
 
     - name: Upload Docker Image as Artifact
       uses: actions/upload-artifact@v4
@@ -40,11 +38,50 @@ jobs:
         name: docker-image
         path: image.tar
 
-  push:
+  update_version_local_repo:
     runs-on: ubuntu-latest
-    needs: build
+    needs: Build_Docker
 
     steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Increment Version in gradle.properties
+      run: |
+        VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
+        IFS='.' read -r major minor patch <<< "$VERSION"
+        patch=$((patch + 1))
+        NEW_VERSION="$major.$minor.$patch"
+        echo "New version: $NEW_VERSION"
+        sed -i "s/^project.version=.*/project.version=$NEW_VERSION/" gradle.properties  
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        echo "::set-output name=NEW_VERSION::$NEW_VERSION"
+
+    - name: Commit and Push Version Update
+      env:
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+      run: |
+        git config --global user.name "avichai"
+        git config --global user.email "avichai321@git.com"
+        git add gradle.properties
+        git commit -m "Auto-incremented version to $NEW_VERSION" || echo "No changes to commit"
+        git push https://x-access-token:${GIT_TOKEN}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
+
+  Push_Docker_to_Docker_HUB:
+    runs-on: ubuntu-latest
+    needs: update_version_local_repo
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Extract Updated Version from gradle.properties
+      id: extract_new_version
+      run: |
+        VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "::set-output name=VERSION::$VERSION"
+
     - name: Download Docker Image Artifact
       uses: actions/download-artifact@v4
       with:
@@ -61,42 +98,10 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-    - name: Push Docker Image to Docker Hub
+    - name: Tag and Push Docker Image
       run: |
         REPO_NAME=${{ github.event.repository.name }}
-        VERSION=${{ needs.build.outputs.version }}
-
-        docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${VERSION} ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:latest
-
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${VERSION}}
+        docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${{ env.VERSION }} ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${{ env.VERSION }}
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${{ env.VERSION }}
+        docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${{ env.VERSION }} ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:latest
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:latest
-
-  update-version:
-    runs-on: ubuntu-latest
-    needs: push
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Increment Version in gradle.properties
-      run: |
-        VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
-        IFS='.' read -r major minor patch <<< "$VERSION"
-        patch=$((patch + 1))
-        NEW_VERSION="$major.$minor.$patch"
-        echo "New version: $NEW_VERSION"
-        sed -i "s/^project.version=.*/project.version=$NEW_VERSION/" gradle.properties
-        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-
-    - name: Commit and Push Version Update
-      env:
-        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-      run: |
-        git config --global user.name "avichai"
-        git config --global user.email "avichai321@git.com"
-        git add gradle.properties
-        git commit -m "Auto-incremented version to $NEW_VERSION" || echo "No changes to commit"
-        
-        # Use PAT for authentication
-        git push https://x-access-token:${GIT_TOKEN}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
