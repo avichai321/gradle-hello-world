@@ -41,14 +41,14 @@ jobs:
 
     - name: Commit and Push Version Update
       env:
-        GH_Token: ${{ secrets.GIT_TOKEN }}
+        GH_TOKEN: ${{ secrets.GIT_TOKEN }}
       run: |
-        git config --global user.name "avichai321"
+        git config --global user.name "avichai"
         git config --global user.email "avichai321@git.com"
         git add gradle.properties
         git commit -m "Auto-incremented version to $VERSION" || echo "No changes to commit"
         # Use PAT for authentication
-        git push https://x-access-token:${GH_Token}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
+        git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
 
     
     - name: Build and push Multistage Docker image
