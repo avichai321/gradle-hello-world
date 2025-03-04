@@ -35,7 +35,7 @@ jobs:
 
     - name: Extract version from gradle.properties
       run: |
-        VERSION=$(grep "version =" build.gradle.kts | sed -E 's/.*version = "([^"]+)".*/\1/')
+        VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
         echo "Extracted version: $VERSION"
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
@@ -50,17 +50,8 @@ jobs:
         # Use PAT for authentication
         git push https://x-access-token:${GH_Token}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
 
-    - name: Build Docker image with Multistage Docker
-      run: |
-        docker buildx build --build-arg REPO_NAME=${{ github.event.repository.name }} -t ${{ github.event.repository.name }}:${{ env.VERSION }} .
-
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-
-    - name: Build and push Docker image
+    
+    - name: Build and push Multistage Docker image
       run: |
         REPO_NAME=${{ github.event.repository.name }}
 
