@@ -15,7 +15,27 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Login to Docker Hub
+    - name: Update Hello World to Hello World Avicii
+      run: |
+        FILE_PATH="src/main/java/com/ido/HelloWorld.java"
+        SEARCH_STRING="System.out.println(\"Hello World!\");"
+        REPLACE_STRING="System.out.println(\"Hello World Avicii!\");"
+
+        if [ ! -f "$FILE_PATH" ]; then
+          echo "Error: File $FILE_PATH does not exist"
+          exit 1
+        fi
+
+        sed -i "s/$SEARCH_STRING/$REPLACE_STRING/g" "$FILE_PATH"
+
+    - name: Extract version from gradle.properties
+      run: |
+        VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
+        echo "Extracted version: $VERSION"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+
+        - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -38,8 +58,8 @@ jobs:
         patch=$((patch + 1))
         NEW_VERSION="$major.$minor.$patch"
         echo "New version: $NEW_VERSION"
-        sed -i "s/^project.version=.*/project.version=$NEW_VERSION/" gradle.properties
-
+        sed -i "s/^project.version=.*/project.version=$NEW_VERSION/" gradle.properties  
+    
     - name: Commit and Push Version Update
       env:
         GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -50,3 +70,5 @@ jobs:
         git commit -m "Auto-incremented version to $VERSION" || echo "No changes to commit"
         # Use PAT for authentication
         git push https://x-access-token:${GIT_TOKEN}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
+
+    
