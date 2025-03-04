@@ -1,3 +1,4 @@
+import java.util.Properties
 import java.io.File
 
 plugins {
@@ -5,11 +6,7 @@ plugins {
     id("application")
     id("java")
     id("idea")
-
-    // This is used to create a GraalVM native image
     id("org.graalvm.buildtools.native") version "0.9.11"
-
-    // This creates a fat JAR
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -21,29 +18,33 @@ repositories {
     mavenCentral()
 }
 
-val projectVersionFile = file("version.txt")
-
-//Function to read and increment version
+// Function to read and increment version in gradle.properties
 fun getNextVersion(): String {
-if (!projectVersionFile.exists()) {
-    projectVersionFile.writeText("1.0.0")
-}
+    val propertiesFile = File("gradle.properties")
+    val properties = Properties()
 
-val currentVersion = projectVersionFile.readText().trim()
-val versionParts = currentVersion.split(".").map { it.toInt() }.toMutableList()
+    if (propertiesFile.exists()) {
+        propertiesFile.inputStream().use { properties.load(it) }
+    }
 
-// Increment the patch version
-versionParts[2] = versionParts[2] + 1
-
-val newVersion = versionParts.joinToString(".")
-projectVersionFile.writeText(newVersion)
-return newVersion
+    var version = properties.getProperty("version", "1.0.0")
+    val versionParts = version.split(".").map { it.toInt() }.toMutableList()
+    
+    // Increment the patch version
+    versionParts[2] += 1
+    
+    val newVersion = versionParts.joinToString(".")
+    properties.setProperty("version", newVersion)
+    
+    propertiesFile.outputStream().use { properties.store(it, "Updated version") }
+    
+    return newVersion
 }
 
 // Set the project version dynamically
 version = getNextVersion()
 
-//Ensure JAR file name matches repo/directory name
+// Ensure JAR file name matches repo/directory name
 val jarName = rootProject.name
 
 tasks.withType<Jar> {

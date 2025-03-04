@@ -1,64 +1,56 @@
 name: Build gradle-hello-world-multistage-docker APP
 
 on:
-    push:
-      branches: 
+  push:
+    branches: 
       - task4
+  workflow_dispatch:
+  
+
 jobs:
   Task_change_code_and_change_ver_two:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-    - name: Update Hello World to Hello World Avicii 
+    - name: Update Hello World to Hello World Avicii
       run: |
-        # The file path for the java file
         FILE_PATH="src/main/java/com/ido/HelloWorld.java"
-        
-        # The 2 var strings for search and replace
         SEARCH_STRING="System.out.println(\"Hello World!\");"
         REPLACE_STRING="System.out.println(\"Hello World Avicii!\");"
-        
-        # Check if file exists
+
         if [ ! -f "$FILE_PATH" ]; then
           echo "Error: File $FILE_PATH does not exist"
           exit 1
         fi
-        
-        # Change the line
+
         sed -i "s/$SEARCH_STRING/$REPLACE_STRING/g" "$FILE_PATH"
 
-    - name: Update build.gradle.kts version or change
-      run: |
-        # Define the gradle file path
-        GRADLE_FILE="build.gradle.kts"
-        
-        # Check if file exists
-        if [ ! -f "$GRADLE_FILE" ]; then
-          echo "Error: $GRADLE_FILE does not exist"
-          exit 1
-        fi
-        
-        # Check if 'version' property already exists
-        if grep -q "version =" "$GRADLE_FILE"; then
-          # Update existing version property
-          sed -i 's/version = ".*"/version = "1.0.0"/g' "$GRADLE_FILE"
-          echo "Updated existing version property"
-        else
-          #Otherwise, add it near the top of the file
-          sed -i '1s/^/version = "1.0.0"\n\n/' "$GRADLE_FILE"
-        fi
+    #- name: Use Gradle wrapper and Build the program
+     # run: |
+      #  chmod +x ./gradlew
+       # ./gradlew build
 
-    - name: Use Gradle wrapper and Build the program
+    - name: Extract version from gradle.properties
       run: |
-        chmod +x ./gradlew
-        ./gradlew build
-    
+        VERSION=$(grep "version =" build.gradle.kts | sed -E 's/.*version = "([^"]+)".*/\1/')
+        echo "Extracted version: $VERSION"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+    - name: Commit and Push Version Update
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+
+        git add gradle.properties
+        git commit -m "Auto-incremented version to $VERSION" || echo "No changes to commit"
+        git push origin task4 || echo "No changes to push"
+
     - name: Build Docker image with Multistage Docker
       run: |
-        VERSION=$(cat version.txt)
-        docker build --build-arg REPO_NAME=${{ github.event.repository.name }} -t ${{ github.event.repository.name }}:${VERSION} .
+        docker build --build-arg REPO_NAME=${{ github.event.repository.name }} -t ${{ github.event.repository.name }}:${{ env.VERSION }} .
 
     - name: Login to Docker Hub
       uses: docker/login-action@v2
@@ -68,15 +60,10 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        VERSION=$(cat version.txt)
         REPO_NAME=${{ github.event.repository.name }}
-        # Build the image
-        docker build --build-arg REPO_NAME=${REPO_NAME} -t ${DOCKER_HUB_USERNAME}/${REPO_NAME}:${VERSION} .
-        # Also create a latest tag
-        docker tag ${DOCKER_HUB_USERNAME}/${REPO_NAME}:${VERSION} ${DOCKER_HUB_USERNAME}/${REPO_NAME}:latest
-        # Push the images
-        docker push ${DOCKER_HUB_USERNAME}/${REPO_NAME}:${VERSION}
-        docker push ${DOCKER_HUB_USERNAME}/${REPO_NAME}:latest
-      env:
-        DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-        DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+        docker build --build-arg REPO_NAME=${REPO_NAME} -t ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${{ env.VERSION }} .
+        docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${{ env.VERSION }} ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:latest
+
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${{ env.VERSION }}
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:latest

@@ -12,7 +12,6 @@ COPY build.gradle.kts ./
 COPY gradlew gradlew.bat ./
 
 #Copy the version file and source code
-COPY version.txt ./version.txt
 COPY src ./src
 # Fix potential line ending issues
 RUN sed -i 's/\r$//' ./gradlew
@@ -21,14 +20,13 @@ RUN ls -la && chmod +x ./gradlew
 
 
 # Get version and build using gradlew
-RUN VERSION=$(cat version.txt) && \
-    echo "Building version: $VERSION" && \
-    ./gradlew clean build -x test && \
+RUN  ./gradlew clean build -x test && \
     cd build/libs && \
     ls && \
-    VERSION=$(cat /app/version.txt) &&\
+    VERSION=$(grep "version =" build.gradle.kts | sed -E 's/.*version = "([^"]+)".*/\1/') &&\
     # Rename the JAR with REPO_NAME
     mv /app/build/libs/app-${VERSION}-all.jar /app/build/libs/${REPO_NAME}-${VERSION}-all.jar
+   
 
 
 # Stage 2: Create the runtime image
@@ -41,14 +39,12 @@ RUN groupadd -r ubuser && useradd -r -g ubuser -m -d /home/ubuser ubuser
 
 WORKDIR /app
 
-COPY --from=builder /app/version.txt /app/version.txt
 # Copy the built JAR from the build stage
 COPY --from=builder /app/build/libs/ ./libs/
 
 
 # Create a startup script that finds the correct JAR
 RUN echo '#!/bin/sh' > /app/startup.sh && \
-    echo 'VERSION=$(cat /app/version.txt)' >> /app/startup.sh && \
     echo 'JAR_FILE="/app/libs/${REPO_NAME}-${VERSION}-all.jar"' >> /app/startup.sh && \
     echo 'echo "Starting application: ${JAR_FILE}"' >> /app/startup.sh && \
     echo 'java -jar ${JAR_FILE}' >> /app/startup.sh && \
