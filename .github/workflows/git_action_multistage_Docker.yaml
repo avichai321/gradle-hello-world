@@ -35,7 +35,7 @@ jobs:
       shell: bash
 
     - name: Upload Docker Image as Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: docker-image
         path: image.tar
@@ -46,7 +46,7 @@ jobs:
 
     steps:
     - name: Download Docker Image Artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: docker-image
         path: .
