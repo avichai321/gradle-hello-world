@@ -33,12 +33,12 @@ jobs:
 
     - name: Increment Version in gradle.properties
       run: |
-          VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
-          IFS='.' read -r major minor patch <<< "$VERSION"
-          patch=$((patch + 1))
-          NEW_VERSION="$major.$minor.$patch"
-          echo "New version: $NEW_VERSION"
-          sed -i "s/^project.version=.*/project.version=$NEW_VERSION/" gradle.properties
+        VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
+        IFS='.' read -r major minor patch <<< "$VERSION"
+        patch=$((patch + 1))
+        NEW_VERSION="$major.$minor.$patch"
+        echo "New version: $NEW_VERSION"
+        sed -i "s/^project.version=.*/project.version=$NEW_VERSION/" gradle.properties
 
     - name: Commit and Push Version Update
       env:
