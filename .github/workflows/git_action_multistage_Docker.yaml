@@ -40,13 +40,15 @@ jobs:
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Commit and Push Version Update
+      env:
+        GH_Token: ${{ secrets.GIT_TOKEN }}
       run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
-
+        git config --global user.name "avichai321"
+        git config --global user.email "avichai321@git.com"
         git add gradle.properties
         git commit -m "Auto-incremented version to $VERSION" || echo "No changes to commit"
-        git push origin task4 || echo "No changes to push"
+        # Use PAT for authentication
+        git push https://x-access-token:${GH_Token}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
 
     - name: Build Docker image with Multistage Docker
       run: |
