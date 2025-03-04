@@ -28,10 +28,10 @@ jobs:
 
         sed -i "s/$SEARCH_STRING/$REPLACE_STRING/g" "$FILE_PATH"
 
-    #- name: Use Gradle wrapper and Build the program
-     # run: |
-      #  chmod +x ./gradlew
-       # ./gradlew build
+    - name: Use Gradle wrapper and Build the program
+      run: |
+        chmod +x ./gradlew
+        ./gradlew build
 
     - name: Extract version from gradle.properties
       run: |
@@ -41,14 +41,14 @@ jobs:
 
     - name: Commit and Push Version Update
       env:
-        GH_TOKEN: ${{ secrets.GIT_TOKEN }}
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
       run: |
         git config --global user.name "avichai"
         git config --global user.email "avichai321@git.com"
         git add gradle.properties
         git commit -m "Auto-incremented version to $VERSION" || echo "No changes to commit"
         # Use PAT for authentication
-        git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
+        git push https://x-access-token:${GIT_TOKEN}@github.com/${{ github.repository }}.git task4 || echo "No changes to push"
 
     
     - name: Build and push Multistage Docker image
