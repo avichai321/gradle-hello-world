@@ -3,7 +3,7 @@ name: Task 3 Build gradle-hello-world docker with gradel
 on:
   push:
     branches: 
-    - master
+    - task3-test-with-use-gradle-only
 
 jobs:
   build_program_and_docker_with_gradle:
