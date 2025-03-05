@@ -2,7 +2,7 @@
 FROM openjdk:11-jre-slim
 
 # Set arguments
-ARG USER=ubuser
+ARG USER=appuser
 ARG HOME=/home/$USER
 ARG JAR_FILE
 
@@ -14,15 +14,17 @@ RUN addgroup --system appgroup && \
 WORKDIR /app
 
 # Copy the fat JAR into the container
-COPY build/libs/${JAR_FILE} gradle_app.jar.jar
+COPY build/libs/${JAR_FILE} app.jar
 
 # Change ownership and permissions
-RUN chown -R $USER:appgroup gradle_app.jar && \
-    chmod 755 gradle_app.jar
+RUN chown -R $USER:appgroup app.jar && \
+    chmod 755 app.jar
 
 # Switch to the non-root user
 USER $USER
 
 # Expose port if your application uses one (optional)
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "gradle_app.jar"]
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
