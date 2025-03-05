@@ -11,7 +11,7 @@ In this Branch i did the task number in 5 who asks us to create a pipeline to th
 -  get in to the folder repo you Downloaded
 -  run ./gradlew build
 
-the Gradle Wrapper will build you the Docker im age as well
+the Gradle Wrapper will build you the Docker image as well
 
 # Pipeline Build roadmap
 1. checkout - first it wiil check the pipeline code before run
