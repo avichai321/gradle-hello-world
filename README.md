@@ -51,5 +51,5 @@ The pipeline is builded from 2 tasks:
     3. Check jar file version and run java - check the results
 
  # Other branches with Tasks
- task4 - the bonus Multistage Docker 
- task3-test-use-gradle-only - build project and Docker image with Gradle
+ - task4 - the bonus Multistage Docker 
+ - task3 - test-use-gradle-only - build project and Docker image with Gradle
