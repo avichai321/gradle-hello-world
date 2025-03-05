@@ -1,25 +1,28 @@
-# Use OpenJDK base image
-FROM openjdk:11
+# Use OpenJDK slim base image
+FROM openjdk:11-jre-slim
 
-# Set a non-root user
-ARG USER=ubuseruser
+# Set arguments
+ARG USER=ubuser
 ARG HOME=/home/$USER
+ARG JAR_FILE
 
 # Create a new user and group
-RUN useradd -m -d $HOME -s /bin/bash $USER
+RUN addgroup --system appgroup && \
+    adduser --system --ingroup appgroup --home $HOME $USER
 
 # Set working directory
 WORKDIR /app
 
 # Copy the fat JAR into the container
-ARG JAR_FILE=build/libs/*-all.jar
-COPY ${JAR_FILE} app.jar
+COPY build/libs/${JAR_FILE} gradle_app.jar.jar
 
 # Change ownership and permissions
-RUN chown -R $USER:$USER /app && chmod 755 /app/app.jar
+RUN chown -R $USER:appgroup gradle_app.jar && \
+    chmod 755 gradle_app.jar
 
 # Switch to the non-root user
 USER $USER
 
-# Run the application
-CMD ["java", "-jar", "app.jar"]
+# Expose port if your application uses one (optional)
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "gradle_app.jar"]
