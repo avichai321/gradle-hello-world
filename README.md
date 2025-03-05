@@ -1,4 +1,6 @@
-# gradle-hello-world
+# gradle-hello-world - branch
+# Task 3 with use Gradle for build jar and the Docker image
+
 # Java Hello World using the Gradle Wrapper and the Kotlin DSL
 This is a Hello World project that contains the most important parts of the Gradle build scripts.
 
