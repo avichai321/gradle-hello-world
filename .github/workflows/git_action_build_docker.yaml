@@ -17,15 +17,6 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-        
-    - name: Cache Gradle dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: gradle-${{ runner.os }}-
 
     - name: Use Gradle wrapper as executable and Build the Program with Gradle
       run: |
@@ -43,7 +34,7 @@ jobs:
       run: |
         VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
         IFS='.' read -r major minor patch <<< "$VERSION"
-        patch=$((patch + 1)) # Ensure Docker gets the incremented version
+        patch=$((patch)) # Ensure Docker gets the incremented version
         IMAGE_TAG="$major.$minor.$patch"
         echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
 
