@@ -39,8 +39,25 @@ if (propertiesFile.exists()) {
     propertiesFile.writer().use { properties.store(it, null) }
 }
 
+// Version increment function
+fun incrementVersion(version: String): String {
+    val parts = version.split(".").map { it.toInt() }.toMutableList()
+    parts[2] = parts[2] + 1
+    return parts.joinToString(".")
+}
+
+// Get and increment current version
 val currentVersion = properties.getProperty("project.version", "1.0.0")
-version = currentVersion
+val newVersion = incrementVersion(currentVersion)
+
+// Update properties file
+properties["project.version"] = newVersion
+propertiesFile.writer().use { 
+    properties.store(it, "Updated project version during build") 
+}
+
+// Set project version
+version = newVersion
 
 // Get the repository name (assuming the project directory name)
 val repoName = rootProject.name.lowercase()
@@ -51,13 +68,8 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     archiveClassifier.set("all")
 }
 
-// Docker build task
-tasks.register("buildDocker") {
-    group = "docker"
-    description = "Builds a Docker image for the project"
-    
-    dependsOn("shadowJar")
-    
+// Docker build task integrated with build
+tasks.named("build") {
     doLast {
         val jarFile = file("build/libs/${repoName}-${project.version}-all.jar")
         
