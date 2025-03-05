@@ -27,7 +27,7 @@ jobs:
       run: |
         cd build/libs
         ls -l 
-        docker images -all 
+        docker images -a 
     
     - name: Fetch Updated Version after build
       id: extract_new_version
