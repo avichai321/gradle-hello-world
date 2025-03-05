@@ -1,18 +1,15 @@
 # gradle-hello-world
-# Java Hello World using the Gradle Wrapper and the Kotlin DSL
-This is a Hello World project that contains the most important parts of the Gradle build scripts.
+# Devops_Exercise-gradle-hello-world
+# Branch - task4
+In this Branch i did the task number in 5 who asks us to create a pipeline to the following actions
+ 1. Version Handling - the Version of the jar file who complies increasing by 1 Every build (gradle build)
+ 2. Build Artifact - Build java artifact and package him (gradle build)
+ 3. Make a Docker image from Him (Multistage Docker) 
+ 4. upload him to Docker Hub (pipeline)
 
-# Tasks
-```
-build - Compiles Hello World and creates JAR files.
-2 jar files will be created:
-- gradle-hello-world-all.jar - this jar contains everything.
-- gradle-hello-world.jar - this is regular jar, it contains only the project's classes.
-```
+# Build With the branch in your own computer
+ 1. install java on your computer before you Start
+ 2. get into of the folder repo you Downloaded
+ 3. docker build -t my-app:latest . (this because the docker file purpose is for the github-actions and in the pipeline he take the name and the tag)  
 
-# Build
-```
-./gradlew build
-The jar files located ar gradle-hello-world/build/libs/
-make the runnable jar executable then, use "java -jar gradle-hello-world-all.jar"
-```
+# pipeline roadmap
