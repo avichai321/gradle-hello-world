@@ -35,9 +35,7 @@ jobs:
         VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//')
         echo $VERSION
         IFS='.' read -r major minor patch <<< "$VERSION"
-        patch=$((patch + 1)) # Ensure Docker gets the incremented version
         IMAGE_TAG="$major.$minor.$patch"
-        echo "VERSION"=$VERSION" >> "$GITHUB_ENV"
         echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
 
 
