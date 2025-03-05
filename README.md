@@ -25,11 +25,11 @@ the Gradle Wrapper will build you the Docker im age as well
 
 
 # Dockerfile
-is a simple Docker file who copy the artifact set him on openjdk:11 environment and dockerize him as image
+Is a simple Docker file who copy the artifact set him on openjdk:11 environment and dockerize him as image
 
 
 # Important information
 1. The gradle Wrapper here use gradle:8.13.
 2. The project is set to use java 11 to avoid dependencies issues.
-3. gradle.properties file held the version of the jar was created in the last build
-4. i use 2.0.0 instead 1.0.0 to not ruin task 4 branch who use this type of version that Both of them can uploaded to the Docker hub simultaneously
+3. Gradle.properties file held the version of the jar was created in the last build
+4. I use 2.0.0 instead 1.0.0 to not ruin task 4 branch who use this type of version that Both of them can uploaded to the Docker hub simultaneously
