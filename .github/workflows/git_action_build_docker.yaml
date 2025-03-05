@@ -1,4 +1,4 @@
-name: Task 3 Build gradle-hello-world docker with gradel
+name: Task 3 Build gradle-hello-world docker with Gradle
 
 on:
   push:
