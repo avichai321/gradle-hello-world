@@ -21,7 +21,7 @@ jobs:
     - name: Use Gradle wrapper as executable and Build the Program with Gradle
       run: |
         chmod +x ./gradlew
-        ./gradlew build
+        ./gradlew clean build --info
 
     - name: Check jar file version and docker after build
       run: |
