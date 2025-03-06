@@ -2,13 +2,9 @@ name: Update Version, Build and Deploy to Docker Hub
 
 on:
   workflow_dispatch:
-    inputs:
-      increment_type:
-        description: 'Type of version increment (major, minor, patch)'
-        required: true
-        default: 'patch'
   push:
-    branches: task3
+    branches: 
+      - task3
     paths:
       - 'build.gradle.kts'
 
@@ -53,20 +49,7 @@ jobs:
           MAJOR=${{ steps.get-version.outputs.major }}
           MINOR=${{ steps.get-version.outputs.minor }}
           PATCH=${{ steps.get-version.outputs.patch }}
-          
-          INCREMENT_TYPE=${{ github.event.inputs.increment_type || 'patch' }}
-          
-          if [ "$INCREMENT_TYPE" = "major" ]; then
-            MAJOR=$((MAJOR + 1))
-            MINOR=0
-            PATCH=0
-          elif [ "$INCREMENT_TYPE" = "minor" ]; then
-            MINOR=$((MINOR + 1))
-            PATCH=0
-          else
-            PATCH=$((PATCH + 1))
-          fi
-          
+          PATCH=$((PATCH + 1))
           NEW_VERSION="$MAJOR.$MINOR.$PATCH"
           echo "New version: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
@@ -90,9 +73,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: main # Get the latest code with the updated version
+          ref: task3
 
-      - name: Set up JDK
+      - name: Set up JDK for app
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -114,3 +97,31 @@ jobs:
           JAR_FILENAME=$(basename "$ALL_JAR")
           echo "Found JAR: $JAR_FILENAME"
           echo "jar_filename=$JAR_FILENAME" >> $GITHUB_OUTPUT
+      
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      
+      
+      - name: Build and push Docker image to docker hub
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.update-version.outputs.new_version }}
+          build-args: |
+            JAR_FILE=${{ steps.find-jar.outputs.jar_filename }}
+      
+      - name: Pull updated image from Docker hub and run
+        run: |
+           docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.update-version.outputs.new_version }}
+           docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.update-version.outputs.new_version }}
