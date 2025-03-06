@@ -1,0 +1,116 @@
+name: Update Version, Build and Deploy to Docker Hub
+
+on:
+  workflow_dispatch:
+    inputs:
+      increment_type:
+        description: 'Type of version increment (major, minor, patch)'
+        required: true
+        default: 'patch'
+  push:
+    branches: task3
+    paths:
+      - 'build.gradle.kts'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.new-version.outputs.new_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Extract current version
+        id: get-version
+        run: |
+          CURRENT_VERSION=$(grep -oP "version\s*=\s*\"\K[^\"]*" build.gradle.kts)
+          echo "Current version: $CURRENT_VERSION"
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          # Split version into components
+          IFS='.' read -r -a VERSION_PARTS <<< "$CURRENT_VERSION"
+          MAJOR=${VERSION_PARTS[0]}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+          
+          echo "major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "minor=$MINOR" >> $GITHUB_OUTPUT
+          echo "patch=$PATCH" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: new-version
+        run: |
+          MAJOR=${{ steps.get-version.outputs.major }}
+          MINOR=${{ steps.get-version.outputs.minor }}
+          PATCH=${{ steps.get-version.outputs.patch }}
+          
+          INCREMENT_TYPE=${{ github.event.inputs.increment_type || 'patch' }}
+          
+          if [ "$INCREMENT_TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$INCREMENT_TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+          
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "New version: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update version in build.gradle.kts
+        run: |
+          sed -i "s/version = \"${{ steps.get-version.outputs.current_version }}\"/version = \"${{ steps.new-version.outputs.new_version }}\"/" build.gradle.kts
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add build.gradle.kts
+          git commit -m "Bump version to ${{ steps.new-version.outputs.new_version }}"
+          git push
+
+  build-and-deploy:
+    needs: update-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: main # Get the latest code with the updated version
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: gradle
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew clean build
+
+      - name: Find JAR with -all suffix
+        id: find-jar
+        run: |
+          ALL_JAR=$(find build/libs/ -name "*-all.jar" -type f | head -n 1)
+          if [ -z "$ALL_JAR" ]; then
+            echo "No JAR file with -all suffix found"
+            exit 1
+          fi
+          JAR_FILENAME=$(basename "$ALL_JAR")
+          echo "Found JAR: $JAR_FILENAME"
+          echo "jar_filename=$JAR_FILENAME" >> $GITHUB_OUTPUT
