@@ -2,7 +2,7 @@
 this is a fork repo from the repo ido83/gradle-hello-world
 
 # Devops_Exercise-gradle-hello-world
-# Branch - task3-test-with-use-gradle-only Overview
+# Branch - master Overview
 In this Branch i did the tasks number 1 and 2 who asks us to create a pipeline to the following actions
 - task 1
     1. Build the Project as is and answer 3 q
