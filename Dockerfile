@@ -23,8 +23,5 @@ RUN chown -R $USER:appgroup app.jar && \
 # Switch to the non-root user
 USER $USER
 
-# Expose port if your application uses one (optional)
-EXPOSE 8080
-
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
