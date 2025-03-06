@@ -8,7 +8,6 @@ WORKDIR /app
 
 #Copy the Gradle wrapper files and build configuration
 COPY gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties gradle/ ./gradle/
-COPY gradle.properties ./
 COPY build.gradle.kts ./
 COPY gradlew gradlew.bat ./
 
@@ -21,7 +20,7 @@ RUN ls -la && chmod +x ./gradlew
 
 # Get version and build using gradlew
 RUN  ./gradlew clean build -x test && \
-    VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//') && \
+    VERSION=$(grep "^version = " gradle.properties | sed -E 's/version = //') && \
     echo {VERSION} && \
     cd build/libs && \
     ls && \ 
@@ -46,7 +45,7 @@ COPY --from=builder /app/gradle.properties ./
 
 # Create a startup script that finds the correct JAR
 RUN echo '#!/bin/sh' > /app/startup.sh && \
-    echo VERSION=$(grep "^project.version=" gradle.properties | sed -E 's/project.version=//') >> /app/startup.sh && \
+    echo VERSION=$(grep "^version = " gradle.properties | sed -E 's/version = //') >> /app/startup.sh && \
     echo 'JAR_FILE="/app/libs/${REPO_NAME}-${VERSION}-all.jar"' >> /app/startup.sh && \
     echo 'echo "Starting application: ${JAR_FILE}"' >> /app/startup.sh && \
     echo 'java -jar ${JAR_FILE}' >> /app/startup.sh && \
