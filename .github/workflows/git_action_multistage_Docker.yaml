@@ -15,8 +15,7 @@ jobs:
 
     - name: Increment Version in build.gradle.kts
       id: version
-      run: |
-      
+      run: | 
         VERSION=$(grep -oP 'version\s*=\s*"\K[^"]*' build.gradle.kts)
         echo "Current version: $VERSION"
         IFS='.' read -r major minor patch <<< "$VERSION"
@@ -24,8 +23,8 @@ jobs:
         NEW_VERSION="$major.$minor.$patch"
         sed -i "s/version = \"$VERSION\"/version = \"$NEW_VERSION\"/" build.gradle.kts
         echo "New version: $NEW_VERSION"
-        echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
-        echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
 
     - name: Build Docker Image with Updated Version
       run: |
