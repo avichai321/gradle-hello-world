@@ -23,7 +23,8 @@ jobs:
         NEW_VERSION="$major.$minor.$patch"
         sed -i "s/version = \"$VERSION\"/version = \"$NEW_VERSION\"/" build.gradle.kts
         echo "New version: $NEW_VERSION"
-        echo "new_version=$NEW_VERSION" >> "$GITHUB_ENV"
+        echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
+        echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
 
     - name: Build Docker Image with Updated Version
