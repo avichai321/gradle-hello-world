@@ -1,22 +1,5 @@
-# gradle-hello-world
-
-# Java Hello World using the Gradle Wrapper and the Kotlin DSL
-This is a Hello World project that contains the most important parts of the Gradle build scripts.
-
-# Tasks
-```
-build - Compiles Hello World and creates JAR files.
-2 jar files will be created:
-- gradle-hello-world-all.jar - this jar contains everything.
-- gradle-hello-world.jar - this is regular jar, it contains only the project's classes.
-```
-
-# Build
-```
-./gradlew build
-The jar files located ar gradle-hello-world/build/libs/
-make the runnable jar executable then, use "java -jar gradle-hello-world-all.jar"
-```
+# gradle-hello-world-Avicii
+this is a fork repo from the repo ido83/gradle-hello-world
 
 # Devops_Exercise-gradle-hello-world
 # Branch - task3-test-with-use-gradle-only Overview
