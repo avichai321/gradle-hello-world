@@ -3,7 +3,7 @@ name: Build Docker, Update Version, and Push to Docker Hub
 on:
   push:
     branches:
-      - task4
+      - task4-gradle-func-update-ver
 
 jobs:
   update_version_local_repo:
