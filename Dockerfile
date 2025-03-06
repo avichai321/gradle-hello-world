@@ -41,7 +41,6 @@ WORKDIR /app
 
 # Copy the built JAR from the build stage
 COPY --from=builder /app/build/libs/ ./libs/
-COPY --from=builder /app/gradle.properties ./
 
 # Create a startup script that finds the correct JAR
 RUN echo '#!/bin/sh' > /app/startup.sh && \
