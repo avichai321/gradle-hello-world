@@ -50,10 +50,10 @@ jobs:
       id: extract_version
       run: |
         VERSION=$(grep -oP 'version\s*=\s*"\K[^"]*' build.gradle.kts)
-        echo "Current version: $VERSION"
         IFS='.' read -r major minor patch <<< "$VERSION"
         patch=$((patch + 1))
         IMAGE_TAG="$major.$minor.$patch"
+        echo "Updated tag: $IMAGE_TAG"
         echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
         echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
 

@@ -20,7 +20,7 @@ RUN ls -la && chmod +x ./gradlew
 
 # Get version and build using gradlew
 RUN  ./gradlew clean build -x test && \
-    VERSION=$(grep "^version = " gradle.properties | sed -E 's/version = //') && \
+    VERSION=$(grep -oP 'version\s*=\s*"\K[^"]*' build.gradle.kts) && \
     echo {VERSION} && \
     cd build/libs && \
     ls && \ 
@@ -45,7 +45,7 @@ COPY --from=builder /app/gradle.properties ./
 
 # Create a startup script that finds the correct JAR
 RUN echo '#!/bin/sh' > /app/startup.sh && \
-    echo VERSION=$(grep "^version = " gradle.properties | sed -E 's/version = //') >> /app/startup.sh && \
+    echo VERSION=$(grep "^version = " build.gradle.kts | sed -E 's/version = //') >> /app/startup.sh && \
     echo 'JAR_FILE="/app/libs/${REPO_NAME}-${VERSION}-all.jar"' >> /app/startup.sh && \
     echo 'echo "Starting application: ${JAR_FILE}"' >> /app/startup.sh && \
     echo 'java -jar ${JAR_FILE}' >> /app/startup.sh && \
