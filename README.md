@@ -21,7 +21,8 @@ the Gradle Wrapper will build you the Docker image as well
 5. Fetch Updated Version after build - take the version number who updated in the file gradle.properties and make us a variable with tag to make sure we use the right version
 6. Commit and Push Version Update - because we did changes in the gradle.properties we want him to to update the git repo as well so he commit and push the changes
 7. Login to Docker Hub - login with user and token
-8. Tag and Push Docker Image with Updated Version - get the image frm the environment variable we save in task 5. tag him on the image and upload him to docker hub
+8. Tag and Push Docker Image with Updated Version - get the image from the environment variable we save in task 5. tag him on the image and upload him to docker hub
+9. Pull and Run Docker Image with Updated Version - Download the image from docker hub and run it
 
 
 # Dockerfile
