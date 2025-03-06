@@ -18,12 +18,13 @@ jobs:
     - name: Increment Version in build.gradle.kts
       id: increment_version
       run: |
-        VERSION=$(grep "^version =" build.gradle.kts | sed -E 's/version =//')
+        VERSION=$(grep -oP 'version\s*=\s*"\K[^"]*' build.gradle.kts)
+        echo "Current version: $VERSION"
         IFS='.' read -r major minor patch <<< "$VERSION"
         patch=$((patch + 1))
         NEW_VERSION="$major.$minor.$patch"
         echo "New version: $NEW_VERSION"
-        sed -i "s/^version =.*/version = $NEW_VERSION/" build.gradle.kts  
+        sed -i "s/version = \"$VERSION\"/version = \"$NEW_VERSION\"/" build.gradle.kts
         echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
         echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
@@ -48,8 +49,10 @@ jobs:
     - name: Fetch Updated Version
       id: extract_version
       run: |
-        VERSION=$(grep "^version =" build.gradle.kts | sed -E 's/version =//')
+        VERSION=$(grep -oP 'version\s*=\s*"\K[^"]*' build.gradle.kts)
+        echo "Current version: $VERSION"
         IFS='.' read -r major minor patch <<< "$VERSION"
+        patch=$((patch + 1))
         IMAGE_TAG="$major.$minor.$patch"
         echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
         echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
