@@ -15,15 +15,15 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Increment Version in gradle.build.kts
+    - name: Increment Version in build.gradle.kts
       id: increment_version
       run: |
-        VERSION=$(grep "^version =" gradle.build.kts | sed -E 's/version =//')
+        VERSION=$(grep "^version =" build.gradle.kts | sed -E 's/version =//')
         IFS='.' read -r major minor patch <<< "$VERSION"
         patch=$((patch + 1))
         NEW_VERSION="$major.$minor.$patch"
         echo "New version: $NEW_VERSION"
-        sed -i "s/^version =.*/version = $NEW_VERSION/" gradle.build.kts  
+        sed -i "s/^version =.*/version = $NEW_VERSION/" build.gradle.kts  
         echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
         echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
@@ -48,7 +48,7 @@ jobs:
     - name: Fetch Updated Version
       id: extract_version
       run: |
-        VERSION=$(grep "^version =" gradle.build.kts | sed -E 's/version =//')
+        VERSION=$(grep "^version =" build.gradle.kts | sed -E 's/version =//')
         IFS='.' read -r major minor patch <<< "$VERSION"
         IMAGE_TAG="$major.$minor.$patch"
         echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
