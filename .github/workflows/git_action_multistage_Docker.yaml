@@ -49,5 +49,5 @@ jobs:
     - name: Pull updated image from Docker hub and run
       run: |
         NEW_VERSION=${{ steps.version.outputs.new_version }}
-        docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{NEW_VERSION}}
-        docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{NEW_VERSION}}
+        docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${NEW_VERSION}
+        docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${NEW_VERSION}
