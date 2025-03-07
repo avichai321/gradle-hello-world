@@ -1,6 +1,6 @@
 # gradle-hello-world
 # Devops_Exercise-gradle-hello-world
-# Branch - task3-test-with-use-gradle-only Overview
+# Branch - task3
 In this Branch i did the task number in 5 who asks us to create a pipeline to the following actions
 1. Version Handling -  the Version of the jar file who complies increasing by 1 Every build (gradle build)
 2. Build Artifact - Build java artifact and package him (gradle build)
