@@ -111,7 +111,7 @@ jobs:
           build-args: |
             JAR_FILE=${{ steps.find-jar.outputs.jar_filename }}
       
-      - name: Pull updated image from Docker hub and run
+      - name: Pull updated image from Docker hub and run container
         run: |
            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.update-version.outputs.new_version }}
            docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.update-version.outputs.new_version }}
