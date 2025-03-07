@@ -38,4 +38,4 @@ The pipeline is builded from 2 tasks:
  - task3 - build project and Docker image upload and run container (1.0.0)
  - task4 - the bonus Multistage Docker (1.1.0)
  - task3 - test-use-gradle-only - build project and Docker image upload and run container all with Gradle (2.0.0)
- - task4 - gradle-func-update-ver - the update version operation happen every build and we have multistage docker
+ - task4 - gradle-func-update-ver - the update version operation happen every build and we have multistage docker (2.1.0)
