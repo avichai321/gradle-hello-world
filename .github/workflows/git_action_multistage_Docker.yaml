@@ -45,15 +45,15 @@ jobs:
         NEW_VERSION="$MAJOR.$MINOR.$PATCH"
         echo "New version: $NEW_VERSION"
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-        sed -i 's/version = "[^"]"/version = "'${NEW_VERSION}'"/' build.gradle.kts
+        sed -i "s/version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" build.gradle.kts 
 
-    #- name: Commit and push changes
-     # run: |
-      #  git config --local user.email "avichai321@github.com"
-       # git config --local user.name "avichai"
-        #git add build.gradle.kts
-        #git commit -m "Bump version to ${{ steps.new-version.outputs.new_version }}"
-        #git push  
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "avichai321@github.com"
+        git config --local user.name "avichai"
+        git add build.gradle.kts
+        git commit -m "Bump version to ${{ steps.new-version.outputs.new_version }}"
+        git push  
 
 
   build-and-deploy:
@@ -67,12 +67,8 @@ jobs:
       - name: Build Docker Image with Updated Version
         run: |
           REPO_NAME=${{ github.event.repository.name }}
-          NEW_VERSION=$(grep -oP "version\s*=\s*\"\K[^\"]*" build.gradle.kts)
-          docker build --build-arg REPO_NAME=${REPO_NAME} -t ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${NEW_VERSION} .
+          docker build --build-arg REPO_NAME=${REPO_NAME} --build-arg VERSION={needs.Update_Version.outputs.new_version}-t ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${needs.Update_Version.outputs.new_version} .
       
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
