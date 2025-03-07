@@ -1,7 +1,7 @@
 # gradle-hello-world
 # Devops_Exercise-gradle-hello-world
 # Branch - task4
-In this Branch i did the task number in 5 bonus who asks us to create a pipeline to the following actions with multistage Docker
+In this Branch i did the task number in the bonus who asks us to create a pipeline to the following actions with multistage Docker
  1. Version Handling - the Version of the jar file who complies increasing by 1 Every build (pipeline)
  2. Build Artifact - Build java artifact and package him (gradle build in Multistage Docker)
  3. Make a Docker image from Him (Multistage Docker) 
@@ -16,14 +16,19 @@ In this Branch i did the task number in 5 bonus who asks us to create a pipeline
 
 
 # pipeline roadmap
- in this pipeline we have 1 job who fo the following things 
- * update_version_local_repo - who increase the version project variable and because the docker file run on himself and cant` update out file
-    1. checkout - first it will check the pipeline code before run 
-    2. Increment Version in build.gradle.kts - update the version property in the build.gradle.kts file by 1
-    3. Build Docker Image with Updated Version - operate the multistage docker and gave him the updated tag he needs
-    4. Login to Docker Hub - login to docker hub with user and password (secret)
-    5. Tag and Push Docker Image with Updated Version - tag the Docker and upload it 
+ in this pipeline we have 2 job who fo the following things 
+ * update_version_local_repo - who increase the version project variable and update him on github repo
+ because the docker file run on himself and cant` update out file
+    1. checkout - first it will check the pipeline code before run
+    2. Extract current version - extract the current version from the build.gradle.kts
+    3. Calculate new version - update the version property in the build.gradle.kts file by 1
+    4. Commit and push changes - commit and push the changes to the git repo
+* build-and-deploy - the stage build the multistage Docker, push it to Docker hub pull him and check container 
+    1. Build Docker Image with Updated Version and tag it - operate the multistage docker and gave him the updated tag he needs
+    2. Login to Docker Hub - login to docker hub with user and password (secret)
+    5. Push Docker Image with Updated Version - tag the Docker and upload it 
     6. Pull updated image from Docker hub and run - Pull the Docker from Docker hub and run it
+
 # multistage Docker
 the multistage Docker is build with 2 stages
 * stage 1 - copy all the files he need build the jar artifact with gradle
@@ -33,4 +38,4 @@ the multistage Docker is build with 2 stages
 # Important information
     1. The gradle Wrapper here use gradle:7.4.2
     2. build.gradle.kts file held the version of the jar was created in the last build
-    3. I use here in 1.1.0 version and in task 3 i use 1.0.0 to not ruin the other branch who use this type of version that Both of them can upload to the Docker hub and be regognized simultaneously and we can see the changes in Docker hub
+    3. I use here in 1.1.0 version and in task 3 i use 1.0.0 to not ruin the other branch (task3) who use this type of version that Both of them can upload to the Docker hub and be recognized in the Docker hub repo
