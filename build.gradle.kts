@@ -1,5 +1,3 @@
-//import java.io.File
-
 plugins {
     kotlin("jvm") version "1.6.20"
     id("application")
