@@ -1,4 +1,4 @@
-# gradle-hello-world-Avicii
+# avichai321/gradle-hello-world
 this is a fork repo from the repo ido83/gradle-hello-world
 
 # Devops_Exercise-gradle-hello-world
@@ -34,5 +34,8 @@ The pipeline is builded from 2 tasks:
     3. Check jar file version and run java - check the results
 
  # Other branches with Tasks
- - task4 - the bonus Multistage Docker 
- - task3 - test-use-gradle-only - build project and Docker image with Gradle
+* in every branch i used diffrent style of version that can all of them will up to docker hub, each style is writed next to the task explanation
+ - task3 - build project and Docker image upload and run container (1.0.0)
+ - task4 - the bonus Multistage Docker (1.1.0)
+ - task3 - test-use-gradle-only - build project and Docker image upload and run container all with Gradle (2.0.0)
+ - task4 - gradle-func-update-ver - the update version operation happen every build and we have multistage docker
