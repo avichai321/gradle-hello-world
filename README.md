@@ -38,4 +38,4 @@ the multistage Docker is build with 2 stages
 # Important information
     1. The gradle Wrapper here use gradle:7.4.2
     2. build.gradle.kts file held the version of the jar was created in the last build
-    3. I use here in 1.1.0 version and in task 3 i use 1.0.0 to not ruin the other branch (task3) who use this type of version that Both of them can upload to the Docker hub and be recognized in the Docker hub repo
+    3. I use here in 1.1.0 version and in task 3 i use 1.0.0 to not ruin the other branch (task3) who use this type of version that Both of them can upload to the Docker hub   and be recognized in the Docker hub Repository
