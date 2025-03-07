@@ -1,6 +1,7 @@
 name: Task4 Build Gradle app with Multistage Docker
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - task4
@@ -13,18 +14,13 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Increment Version in build.gradle.kts
+    - name: Get Version for tag from build.gradle.kts
       id: version
       run: | 
         VERSION=$(grep -oP 'version\s*=\s*"\K[^"]*' build.gradle.kts)
         echo "Current version: $VERSION"
-        IFS='.' read -r major minor patch <<< "$VERSION"
-        patch=$((patch + 1))
-        NEW_VERSION="$major.$minor.$patch"
-        sed -i "s/version = \"$VERSION\"/version = \"$NEW_VERSION\"/" build.gradle.kts
-        echo "New version: $NEW_VERSION"
-        echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
-        echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+        echo "VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
+        echo "VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
 
     - name: Build Docker Image with Updated Version
