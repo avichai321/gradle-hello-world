@@ -1,11 +1,10 @@
 name: Update Version, Build and Deploy to Docker Hub
 
 on:
+  workflow_dispatch:
   push:
     branches: 
       - task3
-    paths:
-      - 'build.gradle.kts'
 
 jobs:
   update-version:
