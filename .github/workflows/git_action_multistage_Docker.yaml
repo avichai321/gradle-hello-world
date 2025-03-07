@@ -10,6 +10,9 @@ jobs:
   Update_Version:
     runs-on: ubuntu-latest
 
+    outputs:
+      new_version: ${{ steps.new-version.outputs.new_version }}"
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -34,6 +37,7 @@ jobs:
     - name: Calculate new version
       id: new-version
       run: |
+        CURRENT_VERSION=$(grep -oP "version\s*=\s*\"\K[^\"]*" build.gradle.kts)
         MAJOR=${{ steps.get-version.outputs.major }}
         MINOR=${{ steps.get-version.outputs.minor }}
         PATCH=${{ steps.get-version.outputs.patch }}
@@ -41,10 +45,16 @@ jobs:
         NEW_VERSION="$MAJOR.$MINOR.$PATCH"
         echo "New version: $NEW_VERSION"
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        sed -i 's/version = "[^"]"/version = "'${NEW_VERSION}'"/' build.gradle.kts
 
-    - name: Update version in build.gradle.kts
+    - name: Commit and push changes
       run: |
-          sed -i "s/version = \"${{ steps.get-version.outputs.current_version }}\"/version = \"${{ steps.new-version.outputs.new_version }}\"/" build.gradle.kts
+        git config --local user.email "avichai321@github.com"
+        git config --local user.name "avichai"
+        git add build.gradle.kts
+        git commit -m "Bump version to ${{ steps.new-version.outputs.new_version }}"
+        git push  
+
 
   build-and-deploy:
     needs: Update_Version
@@ -78,12 +88,11 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:latest
-            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.update-version.outputs.new_version }}
-          build-args: |
-            JAR_FILE=${{ steps.find-jar.outputs.jar_filename }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.Update_Version.outputs.new_version }}
+          
       
       - name: Pull updated image from Docker hub and run
         run: |
-           docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.update-version.outputs.new_version }}
-           docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.update-version.outputs.new_version }}
+           docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.Update_Version.outputs.new_version}}
+           docker run --rm ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.Update_Version.outputs.new_version }}
     
