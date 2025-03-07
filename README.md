@@ -43,4 +43,4 @@ the multistage Docker is build with 2 stages
 # Important information
     1. The gradle Wrapper here use gradle:7.4.2
     2. Gradle.properties file held the version of the jar was created in the last build
-    3. I use 1.0.0 and in task 3 i use 2.0.0 to not ruin the other branch who use this type of version that Both of them can uploaded to the Docker hub simultaneously and we can see the changes in Docker hub
+    3. I use 2.1.0 version style in this branch
