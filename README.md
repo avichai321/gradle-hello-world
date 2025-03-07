@@ -1,6 +1,6 @@
 # gradle-hello-world
 # Devops_Exercise-gradle-hello-world
-# Branch - task4
+# Branch - task4-gradle-func-update-ver
 In this Branch i did the task number in 5 bonus who asks us to create a pipeline to the following actions with multistage Docker
  1. Version Handling - the Version of the jar file who complies increasing by 1 Every build (gradle build)
  2. Build Artifact - Build java artifact and package him (gradle build in Multistage Docker)
