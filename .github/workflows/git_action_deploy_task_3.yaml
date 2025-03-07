@@ -67,7 +67,7 @@ jobs:
         with:
           ref: task3
 
-      - name: Set up JDK for app
+      - name: Set up JDK for APP
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'

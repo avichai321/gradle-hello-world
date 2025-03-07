@@ -21,13 +21,13 @@ the Gradle Wrapper will build you the Docker image as well
    4. Update version in build.gradle.kts - save the new version property in the build.gradle.kts file by 1
    5. Commit and push changes - commit and push the changes to the git repo
 * build-and-deploy - the stage build the multistage Docker, push it to Docker hub pull him and check container
-   1. Set up JDK for the APP - set the java environment for the app
-   2. Build with Gradle - 
-   Build Docker Image with Updated Version and tag it - operate the multistage docker and gave him the updated tag he needs
-
-Login to Docker Hub - login to docker hub with user and password (secret)
-Push Docker Image with Updated Version - tag the Docker and upload it
-Pull updated image from Docker hub and run - Pull the Docker from Docker hub and run it
+   1. checkout - first it will check the pipeline code before run
+   2. Set up JDK for the APP - set the java environment for the app
+   3. Build with Gradle - build the gradle up with the updated version
+   4. Build Docker Image with Updated Version and tag it - create the docker build operation and gave him the updated tag he needs
+   5. Login to Docker Hub - login to docker hub with user and password (secret)
+   6. Push Docker Image with Updated Version - tag the Docker and upload it
+   7. Pull updated image from Docker hub and run - Pull the Docker from Docker hub and run it
 
 
 # Dockerfile
