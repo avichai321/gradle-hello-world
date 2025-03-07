@@ -29,7 +29,7 @@ if (propertiesFile.exists()) {
     propertiesFile.reader().use { properties.load(it) }
 } else {
     // Create gradle.properties and add the default version if it doesn't exist
-    properties["project.version"] = "1.0.0"
+    properties["project.version"] = "2.1.0"
     propertiesFile.writer().use { properties.store(it, null) }
 }
 
@@ -44,7 +44,7 @@ fun incrementVersion(version: String): String {
 }
 
 // Get the current version from gradle.properties
-var currentVersion = properties.getProperty("project.version", "1.0.0")
+var currentVersion = properties.getProperty("project.version", "2.1.0")
 
 // Increment version for next build
 currentVersion = incrementVersion(currentVersion)

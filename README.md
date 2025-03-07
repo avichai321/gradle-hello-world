@@ -43,4 +43,4 @@ the multistage Docker is build with 2 stages
 # Important information
     1. The gradle Wrapper here use gradle:7.4.2
     2. Gradle.properties file held the version of the jar was created in the last build
-    3. I use 2.1.0 version style in this branch
+    3. I use 2.1.0 version style in this branch project
