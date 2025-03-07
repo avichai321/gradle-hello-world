@@ -51,7 +51,7 @@ jobs:
     - name: Commit and push changes
       run: |
         git config --local user.email "avichai321@github.com"
-        git config --local user.name "avichai"
+        git config --local user.name "avichai321"
         git add build.gradle.kts
         git commit -m "Bump version to ${{ steps.new-version.outputs.new_version }}"
         git push  
