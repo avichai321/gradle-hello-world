@@ -20,7 +20,7 @@ RUN sed -i 's/\r$//' ./gradlew
 RUN chmod +x ./gradlew
 
 # Extract version from file and use external VERSION if provided
-RUN FILE_VERSION=$(grep -oP '(?<=version\s*=\s*")[^"]*' build.gradle.kts) && \
+RUN FILE_VERSION=$(grep -o 'version *= *"[^"]*"' build.gradle.kts | grep -o '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*') && \
     # Use external VERSION if provided, otherwise use FILE_VERSION
     EFFECTIVE_VERSION=${VERSION:-$FILE_VERSION} && \
     echo "Current version: $EFFECTIVE_VERSION" && \
