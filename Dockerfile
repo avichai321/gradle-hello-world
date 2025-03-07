@@ -4,6 +4,9 @@ FROM gradle:7.3-jdk11 AS builder
 ARG REPO_NAME=my-app
 ENV REPO_NAME=${REPO_NAME}
 
+# Add version argument with empty default
+ARG VERSION=""
+
 WORKDIR /app
 
 # Copy Gradle wrapper files and build configuration
@@ -16,24 +19,22 @@ COPY src ./src
 RUN sed -i 's/\r$//' ./gradlew
 RUN chmod +x ./gradlew
 
-# Extract version and pass it via ARG
-ARG VERSION
-RUN VERSION=$(grep -oP 'version\s*=\s*"\K[^"]*' build.gradle.kts) && \
-    echo "Current version: $VERSION" && \
-    ./gradlew clean build -x test && \
+# Extract version from file and use external VERSION if provided
+RUN FILE_VERSION=$(grep -oP '(?<=version\s*=\s*")[^"]*' build.gradle.kts) && \
+    # Use external VERSION if provided, otherwise use FILE_VERSION
+    EFFECTIVE_VERSION=${VERSION:-$FILE_VERSION} && \
+    echo "Current version: $EFFECTIVE_VERSION" && \
+    ./gradlew clean build -x test -Pversion=$EFFECTIVE_VERSION && \
     cd build/libs && \
     ls && \
-    # Rename the JAR with REPO_NAME
-    mv /app/build/libs/app-${VERSION}-all.jar /app/build/libs/${REPO_NAME}-${VERSION}-all.jar && \
-    echo "VERSION=$VERSION" >> /app/version.env
+    mv /app/build/libs/app-${EFFECTIVE_VERSION}-all.jar /app/build/libs/${REPO_NAME}-${EFFECTIVE_VERSION}-all.jar && \
+    echo "VERSION=$EFFECTIVE_VERSION" >> /app/version.env
 
 # Stage 2: Create the runtime image
 FROM openjdk:11
 
 ARG REPO_NAME=my-app
-ARG VERSION  # Pass VERSION explicitly again
 ENV REPO_NAME=${REPO_NAME}
-ENV VERSION=${VERSION}
 
 # Create a non-root user and group
 RUN groupadd -r ubuser && useradd -r -g ubuser -m -d /home/ubuser ubuser
@@ -46,7 +47,7 @@ COPY --from=builder /app/build/libs/ ./libs/
 COPY --from=builder /app/version.env ./  
 
 # Load the version from the environment file
-RUN export $(cat /app/version.env | xargs) && \
+RUN . /app/version.env && \
     echo "Extracted VERSION: $VERSION"
 
 # Create a startup script that finds the correct JAR
