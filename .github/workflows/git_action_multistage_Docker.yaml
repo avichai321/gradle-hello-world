@@ -65,7 +65,7 @@ jobs:
         with:
           ref: task4
 
-      - name: Build Docker Image with Updated Version
+      - name: Build Docker Image with Updated Version and tag it
         run: |
           REPO_NAME=${{ github.event.repository.name }}
           NEW_VERSION=${{ needs.Update_Version.outputs.new_version }}
@@ -77,15 +77,12 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Build and push Docker image to Docker Hub
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:latest
-            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.Update_Version.outputs.new_version }}
+      - name: Push Docker Image with Updated Version
+        run: |
+          REPO_NAME=${{ github.event.repository.name }}
+          NEW_VERSION=${{ needs.Update_Version.outputs.new_version }}
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ needs.Update_Version.outputs.new_version }}
 
       - name: Pull updated image from Docker Hub and run
         run: |
