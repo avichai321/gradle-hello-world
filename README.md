@@ -33,4 +33,4 @@ Is a simple Docker file who copy the artifact set him on openjdk:11 environment 
 1. The gradle Wrapper here use gradle:8.13.
 2. The project is set to use java 11 to avoid dependencies issues.
 3. Gradle.properties file held the version of the jar was created in the last build
-4. I use 2.0.0 instead 1.0.0 to not ruin task 4 branch who use this type of version that Both of them can uploaded to the Docker hub simultaneously
+4. In this branch 2.0.0 versions style
