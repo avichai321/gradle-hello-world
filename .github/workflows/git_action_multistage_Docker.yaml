@@ -57,7 +57,7 @@ jobs:
       - name: Build Docker Image with Updated Version
         run: |
           REPO_NAME=${{ github.event.repository.name }}
-          NEW_VERSION=${{ steps.new-version.outputs.new_version }}
+          NEW_VERSION=$(grep -oP "version\s*=\s*\"\K[^\"]*" build.gradle.kts)
           docker build --build-arg REPO_NAME=${REPO_NAME} -t ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${NEW_VERSION} .
       
       - name: Set up Docker Buildx
