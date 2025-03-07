@@ -38,4 +38,4 @@ Is a simple Docker file who copy the artifact set him on openjdk:11 environment 
 1. The gradle Wrapper here use gradle:8.13.
 2. The project is set to use java 11 to avoid dependencies issues.
 3. Gradle.properties file held the version of the jar was created in the last build
-4. In this branch 1.1.0 versions style
+4. In this branch 1.0.0 versions style

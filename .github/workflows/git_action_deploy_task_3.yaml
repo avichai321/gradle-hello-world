@@ -95,12 +95,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      
-      - name: Build Docker Image with Updated Version and tag it
-        run: |
-          REPO_NAME=${{ github.event.repository.name }}
-          NEW_VERSION=${{ needs.update-version.outputs.new_version }}
-          docker build --build-arg REPO_NAME=${REPO_NAME} --build-arg VERSION=${NEW_VERSION} -t ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${NEW_VERSION} .
+
 
 
       - name: Push Docker Image with Updated Version
