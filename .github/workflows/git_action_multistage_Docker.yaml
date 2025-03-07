@@ -47,13 +47,13 @@ jobs:
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
         sed -i 's/version = "[^"]"/version = "'${NEW_VERSION}'"/' build.gradle.kts
 
-    - name: Commit and push changes
-      run: |
-        git config --local user.email "avichai321@github.com"
-        git config --local user.name "avichai"
-        git add build.gradle.kts
-        git commit -m "Bump version to ${{ steps.new-version.outputs.new_version }}"
-        git push  
+    #- name: Commit and push changes
+     # run: |
+      #  git config --local user.email "avichai321@github.com"
+       # git config --local user.name "avichai"
+        #git add build.gradle.kts
+        #git commit -m "Bump version to ${{ steps.new-version.outputs.new_version }}"
+        #git push  
 
 
   build-and-deploy:
