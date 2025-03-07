@@ -14,14 +14,23 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Get Version for tag from build.gradle.kts
-      id: version
-      run: | 
-        VERSION=$(grep -oP 'version\s*=\s*"\K[^"]*' build.gradle.kts)
-        echo "Current version: $VERSION"
-        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-        echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
-      
+    - name: Extract current version
+      id: get-version
+      run: |
+        CURRENT_VERSION=$(grep -oP "version\s*=\s*\"\K[^\"]*" build.gradle.kts)
+        echo "Current version: $CURRENT_VERSION"
+        echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        
+        # Split version into components
+        IFS='.' read -r -a VERSION_PARTS <<< "$CURRENT_VERSION"
+        MAJOR=${VERSION_PARTS[0]}
+        MINOR=${VERSION_PARTS[1]}
+        PATCH=${VERSION_PARTS[2]}
+        
+        echo "major=$MAJOR" >> $GITHUB_OUTPUT
+        echo "minor=$MINOR" >> $GITHUB_OUTPUT
+        echo "patch=$PATCH" >> $GITHUB_OUTPUT
+
     - name: Calculate new version
       id: new-version
       run: |
@@ -30,13 +39,17 @@ jobs:
         PATCH=${{ steps.get-version.outputs.patch }}
         PATCH=$((PATCH + 1))
         NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-        echo "new_version=$NEW_VERSION" >> "$GITHUB_ENV"
+        echo "New version: $NEW_VERSION"
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Update version in build.gradle.kts
+      run: |
+          sed -i "s/version = \"${{ steps.get-version.outputs.current_version }}\"/version = \"${{ steps.new-version.outputs.new_version }}\"/" build.gradle.kts
 
     - name: Build Docker Image with Updated Version
       run: |
         REPO_NAME=${{ github.event.repository.name }}
-        NEW_VERSION=${{ steps.version.outputs.new_version }}
+        NEW_VERSION=${{ steps.new-version.outputs.new_version }}
         docker build --build-arg REPO_NAME=${REPO_NAME} -t ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${NEW_VERSION} .
 
     - name: Login to Docker Hub
@@ -48,7 +61,7 @@ jobs:
     - name: Tag and Push Docker Image with Updated Version
       run: |
         REPO_NAME=${{ github.event.repository.name }}
-        NEW_VERSION=${{ steps.version.outputs.new_version }}
+        NEW_VERSION=${{ steps.new-version.outputs.new_version }}
         docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${NEW_VERSION} ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:latest
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:${NEW_VERSION}
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${REPO_NAME}:latest
