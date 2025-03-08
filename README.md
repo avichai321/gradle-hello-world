@@ -17,7 +17,7 @@ In this Branch i did the tasks number 1 and 2 who asks us to create a pipeline t
 # Questions answers
  1. If the question mean to the project language so its java but if we look on the build.gradle.kts the program language we use there is kotlin DSL 
  2. Gradle is a tool who helps us to deploy project with tasks we create in the gradle.build.kts after that we wrote the command "gradlew build" (if thats the task we want operate) and the task will happen
- 3. gradle wrapper is a file who gave as the opportunity to choose the gradle program to the project and we even not need to install gradle in our computer (very helpful i must say)
+ 3. gradle wrapper is a file who gave as the opportunity to choose the gradle program to the project and we even not need to install gradle in our computer
  4. The rest of things will happen face to face
 
 # pipeline roadmap
